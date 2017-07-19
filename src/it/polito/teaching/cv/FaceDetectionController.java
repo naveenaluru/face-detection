@@ -1,15 +1,10 @@
 package it.polito.teaching.cv;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javafx.embed.swing.SwingFXUtils;
-import javax.imageio.ImageIO;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Rect;
