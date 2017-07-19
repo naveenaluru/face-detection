@@ -1,18 +1,26 @@
 package it.polito.teaching.cv;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javafx.embed.swing.SwingFXUtils;
+import javax.imageio.ImageIO;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.objdetect.Objdetect;
 import org.opencv.videoio.VideoCapture;
+
 
 import it.polito.elite.teaching.cv.utils.Utils;
 import javafx.event.Event;
@@ -104,6 +112,7 @@ public class FaceDetectionController
 						// convert and show the frame
 						Image imageToShow = Utils.mat2Image(frame);
 						updateImageView(originalFrame, imageToShow);
+
 					}
 				};
 				
@@ -201,9 +210,14 @@ public class FaceDetectionController
 				
 		// each rectangle in faces is a face: draw them!
 		Rect[] facesArray = faces.toArray();
-		for (int i = 0; i < facesArray.length; i++)
+		for (int i = 0; i < facesArray.length; i++) {
 			Imgproc.rectangle(frame, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0), 3);
-			
+			System.out.println("Found a face");
+			Mat image = new Mat(frame, facesArray[i]);
+			Imgcodecs.imwrite("/home/nidhish/chavar/faces" + UUID.randomUUID() +".png" ,image);
+
+		}
+
 	}
 	
 	/**
