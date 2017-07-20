@@ -1,5 +1,6 @@
 package it.polito.teaching.cv;
 
+import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -38,6 +39,9 @@ import javafx.scene.image.ImageView;
  */
 public class FaceDetectionController
 {
+
+
+	private final String workingDirectory = System.getProperty("user.dir");
 	// FXML buttons
 	@FXML
 	private Button cameraButton;
@@ -60,7 +64,11 @@ public class FaceDetectionController
 	// face cascade classifier
 	private CascadeClassifier faceCascade;
 	private int absoluteFaceSize;
-	
+
+	private int currentCapturedNum =0;
+
+	private int faceCaptureInterval =100;
+
 	/**
 	 * Init the controller, at start time
 	 */
@@ -74,6 +82,8 @@ public class FaceDetectionController
 		originalFrame.setFitWidth(600);
 		// preserve image ratio
 		originalFrame.setPreserveRatio(true);
+
+		System.out.println("Working Directory = " + workingDirectory);
 	}
 	
 	/**
@@ -112,7 +122,7 @@ public class FaceDetectionController
 				};
 				
 				this.timer = Executors.newSingleThreadScheduledExecutor();
-				this.timer.scheduleAtFixedRate(frameGrabber, 0, 33, TimeUnit.MILLISECONDS);
+				this.timer.scheduleAtFixedRate(frameGrabber, 0, 500, TimeUnit.MILLISECONDS);
 				
 				// update the button content
 				this.cameraButton.setText("Stop Camera");
@@ -202,15 +212,20 @@ public class FaceDetectionController
 		// detect faces
 		this.faceCascade.detectMultiScale(grayFrame, faces, 1.1, 2, 0 | Objdetect.CASCADE_SCALE_IMAGE,
 				new Size(this.absoluteFaceSize, this.absoluteFaceSize), new Size());
-				
+
+
 		// each rectangle in faces is a face: draw them!
 		Rect[] facesArray = faces.toArray();
 		for (int i = 0; i < facesArray.length; i++) {
 			Imgproc.rectangle(frame, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0), 3);
-			System.out.println("Found a face");
-			Mat image = new Mat(frame, facesArray[i]);
-			Imgcodecs.imwrite("/home/nidhish/chavar/faces" + UUID.randomUUID() +".png" ,image);
-
+			if ((currentCapturedNum % faceCaptureInterval) ==0){
+				System.out.println("Found a face " + new Date());
+				Mat image = new Mat(frame, facesArray[i]);
+				Imgcodecs.imwrite(workingDirectory+"/faces/face" + System.currentTimeMillis() +".png" ,image);
+				currentCapturedNum =0;
+			}else{
+				currentCapturedNum++;
+			}
 		}
 
 	}
@@ -247,8 +262,12 @@ public class FaceDetectionController
 		// check whether the haar checkbox is selected and deselect it
 		if (this.haarClassifier.isSelected())
 			this.haarClassifier.setSelected(false);
-			
-		this.checkboxSelection("lbpcascades/lbpcascade_frontalface.xml");
+
+		String frontalFace = this.getClass().getClassLoader().getResource
+			("lbpcascades/lbpcascade_frontalface.xml").getFile();
+
+
+		this.checkboxSelection(frontalFace);
 	}
 	
 	/**
