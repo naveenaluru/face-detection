@@ -23,65 +23,64 @@ import com.amazonaws.util.IOUtils;
 
 public class SearchFacesService {
 
-	public static final String COLLECTION_ID = "nnaircollection";
-	private static final String CREDENTIALS_KEY = "AKIAJQ2BRVHBPDZKHF7Q";
-	private static final String CREDENTIALS_SECRET = "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";
-	private static final String PATH_TO_PROCESS = System.getProperty("user.dir")+"/faces";
-	private static final Float THRESHOLD = 70F;
-	private static final int MAX_FACES = 2;
+   public static final String COLLECTION_ID = "nnaircollection";
+   private static final String CREDENTIALS_KEY = "";
+   private static final String CREDENTIALS_SECRET = "";
+   private static final String PATH_TO_PROCESS = System.getProperty("user.dir") + "/faces";
+   private static final Float THRESHOLD = 70F;
+   private static final int MAX_FACES = 2;
 
-	public List<FaceMatch> search() throws Exception {
+   public List<FaceMatch> search() throws Exception {
 
-		AWSCredentials credentials = new BasicAWSCredentials(CREDENTIALS_KEY, CREDENTIALS_SECRET);
-		AmazonRekognition amazonRekognition = AmazonRekognitionClientBuilder.standard().withRegion(Regions.US_EAST_1)
-				.withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
+      AWSCredentials credentials = new BasicAWSCredentials(CREDENTIALS_KEY, CREDENTIALS_SECRET);
+      AmazonRekognition amazonRekognition = AmazonRekognitionClientBuilder.standard().withRegion(Regions.US_EAST_1)
+          .withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
 
-		File dir = new File(PATH_TO_PROCESS);
-		if (dir.isDirectory()) {
-			return readPicturesAndFindMatch(amazonRekognition, dir);
-		} else {
-			throw new RuntimeException("Provided path is not a directory");
-		}
-	}
+      File dir = new File(PATH_TO_PROCESS);
+      if (dir.isDirectory()) {
+         return readPicturesAndFindMatch(amazonRekognition, dir);
+      } else {
+         throw new RuntimeException("Provided path is not a directory");
+      }
+   }
 
-	private List<FaceMatch> readPicturesAndFindMatch(AmazonRekognition amazonRekognition, File dir)
-			throws IOException, FileNotFoundException {
-		List<FaceMatch> faceMatches = new ArrayList<>(); 
-		for (final File photo : dir.listFiles()) {
+   private List<FaceMatch> readPicturesAndFindMatch(AmazonRekognition amazonRekognition, File dir)
+       throws IOException, FileNotFoundException {
+      List<FaceMatch> faceMatches = new ArrayList<>();
+      for (final File photo : dir.listFiles()) {
 
-			ByteBuffer imageBytes;
-			try (InputStream inputStream = new FileInputStream(photo)) {
-				imageBytes = ByteBuffer.wrap(IOUtils.toByteArray(inputStream));
-			}
+         ByteBuffer imageBytes;
+         try (InputStream inputStream = new FileInputStream(photo)) {
+            imageBytes = ByteBuffer.wrap(IOUtils.toByteArray(inputStream));
+         }
 
-			// Read image from folder and create image object
-			Image image = new Image().withBytes(imageBytes);
+         // Read image from folder and create image object
+         Image image = new Image().withBytes(imageBytes);
 
-			// Search collection for faces similar to the largest face in
-			// the image.
-			SearchFacesByImageResult searchFacesByImageResult = callSearchFacesByImage(COLLECTION_ID, image,
-					amazonRekognition);
+         // Search collection for faces similar to the largest face in
+         // the image.
+         SearchFacesByImageResult searchFacesByImageResult = callSearchFacesByImage(COLLECTION_ID, image,
+             amazonRekognition);
 
-			System.out.println("Faces matching largest face in image  " + photo.getName());
-			List<FaceMatch> faceImageMatches = searchFacesByImageResult.getFaceMatches();
-			for (FaceMatch face : faceImageMatches) {
-				System.out.println(face.getFace().toString());
-				System.out.println();
-			}
-			
-			faceMatches.addAll(searchFacesByImageResult.getFaceMatches());
+         System.out.println("Faces matching largest face in image  " + photo.getName());
+         List<FaceMatch> faceImageMatches = searchFacesByImageResult.getFaceMatches();
+         for (FaceMatch face : faceImageMatches) {
+            System.out.println(face.getFace().toString());
+            System.out.println();
+         }
 
-			photo.delete();
-		}
-		
-		return faceMatches;
-	}
+         faceMatches.addAll(searchFacesByImageResult.getFaceMatches());
 
-	private SearchFacesByImageResult callSearchFacesByImage(String collectionId, Image image,
-			AmazonRekognition amazonRekognition) {
-		SearchFacesByImageRequest searchFacesByImageRequest = new SearchFacesByImageRequest()
-				.withCollectionId(collectionId).withImage(image).withFaceMatchThreshold(THRESHOLD)
-				.withMaxFaces(MAX_FACES);
-		return amazonRekognition.searchFacesByImage(searchFacesByImageRequest);
-	}
+         photo.delete();
+      }
+
+      return faceMatches;
+   }
+
+   private SearchFacesByImageResult callSearchFacesByImage(String collectionId, Image image,
+       AmazonRekognition amazonRekognition) {
+      SearchFacesByImageRequest searchFacesByImageRequest = new SearchFacesByImageRequest()
+          .withCollectionId(collectionId).withImage(image).withFaceMatchThreshold(THRESHOLD).withMaxFaces(MAX_FACES);
+      return amazonRekognition.searchFacesByImage(searchFacesByImageRequest);
+   }
 }

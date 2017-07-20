@@ -74,7 +74,6 @@ public class FaceDetectionController
 	private CascadeClassifier faceCascade;
 	private int absoluteFaceSize;
 
-	private int currentCapturedNum =0;
 
 	private int faceCaptureIntervalInSeconds =10;
 
