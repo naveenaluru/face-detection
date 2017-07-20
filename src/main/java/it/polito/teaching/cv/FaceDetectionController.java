@@ -67,7 +67,7 @@ public class FaceDetectionController
 
 	private int currentCapturedNum =0;
 
-	private int faceCaptureIntervalInSeconds =1;
+	private int faceCaptureIntervalInSeconds =10;
 
 	private long lastCapturedMillis = System.currentTimeMillis();
 
