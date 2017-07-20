@@ -1,5 +1,6 @@
 package it.polito.teaching.cv;
 
+import java.io.File;
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -67,7 +68,7 @@ public class FaceDetectionController
 
 	private int currentCapturedNum =0;
 
-	private int faceCaptureInterval =100;
+	private int faceCaptureInterval =1000;
 
 	/**
 	 * Init the controller, at start time
@@ -122,7 +123,7 @@ public class FaceDetectionController
 				};
 				
 				this.timer = Executors.newSingleThreadScheduledExecutor();
-				this.timer.scheduleAtFixedRate(frameGrabber, 0, 500, TimeUnit.MILLISECONDS);
+				this.timer.scheduleAtFixedRate(frameGrabber, 0, 30, TimeUnit.MILLISECONDS);
 				
 				// update the button content
 				this.cameraButton.setText("Stop Camera");
@@ -214,14 +215,24 @@ public class FaceDetectionController
 				new Size(this.absoluteFaceSize, this.absoluteFaceSize), new Size());
 
 
-		// each rectangle in faces is a face: draw them!
+		String facesDirectoryName = workingDirectory+"/faces";
+
+		File facesDirectory = new File(facesDirectoryName);
+
+		if (!facesDirectory.exists()) {
+			facesDirectory.mkdir();
+		}
+
+			// each rectangle in faces is a face: draw them!
 		Rect[] facesArray = faces.toArray();
 		for (int i = 0; i < facesArray.length; i++) {
 			Imgproc.rectangle(frame, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0), 3);
 			if ((currentCapturedNum % faceCaptureInterval) ==0){
 				System.out.println("Found a face " + new Date());
 				Mat image = new Mat(frame, facesArray[i]);
-				Imgcodecs.imwrite(workingDirectory+"/faces/face" + System.currentTimeMillis() +".png" ,image);
+
+
+				Imgcodecs.imwrite(facesDirectoryName+"/face" + System.currentTimeMillis() +".png" ,image);
 				currentCapturedNum =0;
 			}else{
 				currentCapturedNum++;
