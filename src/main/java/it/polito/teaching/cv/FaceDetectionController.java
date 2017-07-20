@@ -2,7 +2,6 @@ package it.polito.teaching.cv;
 
 import java.io.File;
 import java.util.Date;
-import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -68,7 +67,9 @@ public class FaceDetectionController
 
 	private int currentCapturedNum =0;
 
-	private int faceCaptureInterval =1000;
+	private int faceCaptureIntervalInSeconds =1;
+
+	private long lastCapturedMillis = System.currentTimeMillis();
 
 	/**
 	 * Init the controller, at start time
@@ -227,15 +228,14 @@ public class FaceDetectionController
 		Rect[] facesArray = faces.toArray();
 		for (int i = 0; i < facesArray.length; i++) {
 			Imgproc.rectangle(frame, facesArray[i].tl(), facesArray[i].br(), new Scalar(0, 255, 0), 3);
-			if ((currentCapturedNum % faceCaptureInterval) ==0){
+			long currentTime = System.currentTimeMillis();
+
+			if (lastCapturedMillis +  faceCaptureIntervalInSeconds * 1000 <  currentTime ) {
 				System.out.println("Found a face " + new Date());
 				Mat image = new Mat(frame, facesArray[i]);
 
-
-				Imgcodecs.imwrite(facesDirectoryName+"/face" + System.currentTimeMillis() +".png" ,image);
-				currentCapturedNum =0;
-			}else{
-				currentCapturedNum++;
+				Imgcodecs.imwrite(facesDirectoryName + "/face" + System.currentTimeMillis() + ".png", image);
+				lastCapturedMillis = currentTime;
 			}
 		}
 
