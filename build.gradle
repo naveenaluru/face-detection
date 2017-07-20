@@ -51,6 +51,9 @@ dependencies {
 
     // This dependency is found on compile classpath of this component and consumers.
     compile 'com.google.guava:guava:21.0'
+    
+    compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-rekognition', version: '1.11.66'
 
 //    runtime files('libs/opencv-320.jar')
 //    testCompile files('libs/opencv-320.jar')

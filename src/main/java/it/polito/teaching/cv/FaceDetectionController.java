@@ -2,6 +2,7 @@ package it.polito.teaching.cv;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -17,12 +18,15 @@ import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.objdetect.Objdetect;
 import org.opencv.videoio.VideoCapture;
 
+import com.amazonaws.services.rekognition.model.FaceMatch;
 
 import it.polito.elite.teaching.cv.utils.Utils;
+import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -54,8 +58,13 @@ public class FaceDetectionController
 	@FXML
 	private CheckBox lbpClassifier;
 	
+	@FXML
+	private Label faceIdLabel;
+	
 	// a timer for acquiring the video stream
 	private ScheduledExecutorService timer;
+	
+	private ScheduledExecutorService faceMatcherService;
 	// the OpenCV object that performs the video capture
 	private VideoCapture capture;
 	// a flag to change the button behavior
@@ -126,6 +135,34 @@ public class FaceDetectionController
 				this.timer = Executors.newSingleThreadScheduledExecutor();
 				this.timer.scheduleAtFixedRate(frameGrabber, 0, 30, TimeUnit.MILLISECONDS);
 				
+				// grab a frame every 33 ms (30 frames/sec)
+				Runnable faceMatcher = new Runnable() {
+					
+					@Override
+					public void run()
+					{
+						try {
+							List<FaceMatch> matches = new SearchFacesService().search();
+							
+							System.out.println(matches.size());
+							for(FaceMatch match: matches) {
+								String faceId = match.getFace().getFaceId();
+								System.out.println("Matched faceId: "+faceId);
+								displayResults(faceId);
+							}
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+					}
+				};
+				
+				this.faceMatcherService = Executors.newSingleThreadScheduledExecutor();
+				this.faceMatcherService.scheduleAtFixedRate(faceMatcher, 0, 1, TimeUnit.SECONDS);
+				
+				
+				
 				// update the button content
 				this.cameraButton.setText("Stop Camera");
 			}
@@ -148,6 +185,14 @@ public class FaceDetectionController
 			// stop the timer
 			this.stopAcquisition();
 		}
+	}
+	
+	private void displayResults(String faceId) {
+		Image imageToShow = new Image("https://i0.wp.com/www.soccercleats101.com/wp-content/uploads/2017/06/Nike-Motion-Blur-Pack-Flash-Sale.jpg");
+		
+		Platform.runLater(() -> {
+			faceIdLabel.setText("Hi " + faceId + "!!");
+		});
 	}
 	
 	/**
@@ -308,6 +353,9 @@ public class FaceDetectionController
 				// stop the timer
 				this.timer.shutdown();
 				this.timer.awaitTermination(33, TimeUnit.MILLISECONDS);
+				
+				this.faceMatcherService.shutdown();
+				this.faceMatcherService.awaitTermination(33, TimeUnit.MILLISECONDS);
 			}
 			catch (InterruptedException e)
 			{

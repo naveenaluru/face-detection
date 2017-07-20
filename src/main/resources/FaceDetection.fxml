@@ -73,7 +73,7 @@
               <Insets bottom="5" left="5" right="5" top="5"/>
             </padding>
 
-            <Label alignment="TOP_LEFT" contentDisplay="CENTER" prefHeight="25.0" prefWidth="388.0" text="Face id: ">
+            <Label fx:id="faceIdLabel" alignment="TOP_LEFT" contentDisplay="CENTER" prefHeight="25.0" prefWidth="388.0" text="Face id: ">
               <HBox.margin>
                 <Insets top="10.0"/>
               </HBox.margin>
