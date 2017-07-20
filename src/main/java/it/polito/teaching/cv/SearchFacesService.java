@@ -77,10 +77,17 @@ public class SearchFacesService {
       return faceMatches;
    }
 
-   private SearchFacesByImageResult callSearchFacesByImage(String collectionId, Image image,
-       AmazonRekognition amazonRekognition) {
-      SearchFacesByImageRequest searchFacesByImageRequest = new SearchFacesByImageRequest()
-          .withCollectionId(collectionId).withImage(image).withFaceMatchThreshold(THRESHOLD).withMaxFaces(MAX_FACES);
-      return amazonRekognition.searchFacesByImage(searchFacesByImageRequest);
-   }
+	private SearchFacesByImageResult callSearchFacesByImage(String collectionId, Image image,
+			AmazonRekognition amazonRekognition) {
+		SearchFacesByImageRequest searchFacesByImageRequest = new SearchFacesByImageRequest()
+				.withCollectionId(collectionId).withImage(image).withFaceMatchThreshold(THRESHOLD)
+				.withMaxFaces(MAX_FACES);
+		try {
+			return amazonRekognition.searchFacesByImage(searchFacesByImageRequest);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

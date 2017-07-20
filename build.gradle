@@ -54,6 +54,9 @@ dependencies {
     
     compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
     compile group: 'com.amazonaws', name: 'aws-java-sdk-rekognition', version: '1.11.66'
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb', version: '1.11.66'
+    compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.66'
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-core', version: '1.11.66'
 
 //    runtime files('libs/opencv-320.jar')
 //    testCompile files('libs/opencv-320.jar')

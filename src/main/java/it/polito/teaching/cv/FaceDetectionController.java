@@ -1,6 +1,7 @@
 package it.polito.teaching.cv;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -29,6 +30,8 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
+import javafx.util.Pair;
 
 /**
  * The controller associated with the only view of our application. The
@@ -61,6 +64,12 @@ public class FaceDetectionController
 	@FXML
 	private Label faceIdLabel;
 	
+	@FXML
+	private Label tagLabel;
+	
+	@FXML
+	private ImageView prefImage;
+	
 	// a timer for acquiring the video stream
 	private ScheduledExecutorService timer;
 	
@@ -75,7 +84,7 @@ public class FaceDetectionController
 	private int absoluteFaceSize;
 
 
-	private int faceCaptureIntervalInSeconds =10;
+	private int faceCaptureIntervalInSeconds =1;
 
 	private long lastCapturedMillis = System.currentTimeMillis();
 
@@ -187,11 +196,23 @@ public class FaceDetectionController
 	}
 	
 	private void displayResults(String faceId) {
-		Image imageToShow = new Image("https://i0.wp.com/www.soccercleats101.com/wp-content/uploads/2017/06/Nike-Motion-Blur-Pack-Flash-Sale.jpg");
-		
-		Platform.runLater(() -> {
-			faceIdLabel.setText("Hi " + faceId + "!!");
-		});
+		try {
+			Pair<String, WritableImage> preference = DynamoDBClient.getPreference(faceId);
+			
+			if(preference == null) {
+				return;
+			}
+			
+			Platform.runLater(() -> {
+				faceIdLabel.setText("Hi " + faceId + "!!");
+				tagLabel.setText("This person preference is for: " + preference.getKey());
+				prefImage.setImage(preference.getValue());
+				
+			});
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/**
