@@ -11,15 +11,15 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="190.0" prefWidth="592.0" xmlns="http://javafx.com/javafx/null"
-  xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polito.teaching.cv.FaceDetectionController">
+<BorderPane xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1"
+  fx:controller="it.polito.teaching.cv.FaceDetectionController">
   <left>
-    <BorderPane>
+    <BorderPane prefHeight="190.0" prefWidth="592.0" BorderPane.alignment="TOP_LEFT">
       <top>
         <VBox>
           <HBox alignment="CENTER" spacing="10">
             <padding>
-              <Insets bottom="10" top="10"/>
+              <Insets bottom="16" top="16"/>
             </padding>
             <CheckBox fx:id="haarClassifier" onAction="#haarSelected" text="Haar Classifier"/>
             <CheckBox fx:id="lbpClassifier" onAction="#lbpSelected" text="LBP Classifier"/>
@@ -38,22 +38,22 @@
       <bottom>
         <HBox alignment="CENTER">
           <padding>
-            <Insets bottom="25" left="25" right="25" top="25"/>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
           </padding>
           <Button fx:id="cameraButton" alignment="center" disable="true" onAction="#startCamera" text="Start camera"/>
         </HBox>
       </bottom>
     </BorderPane>
   </left>
-  <right>
-    <BorderPane>
+  <center>
+    <BorderPane prefHeight="190.0" prefWidth="471.0" BorderPane.alignment="TOP_LEFT">
       <top>
         <VBox>
-          <HBox alignment="TOP_CENTER" spacing="100">
+          <HBox alignment="TOP_CENTER" spacing="10">
             <padding>
-              <Insets bottom="5" left="5" right="25" top="5"/>
+              <Insets bottom="10" top="10"/>
             </padding>
-            <Label alignment="TOP_LEFT" contentDisplay="CENTER" prefHeight="25.0" prefWidth="304.0"
+            <Label alignment="TOP_LEFT" contentDisplay="CENTER"
               text="Search Results">
               <font>
                 <Font size="20.0"/>
@@ -64,7 +64,52 @@
         </VBox>
 
       </top>
+
+      <center>
+        <VBox alignment="TOP_LEFT">
+
+          <HBox alignment="TOP_LEFT" spacing="10">
+            <padding>
+              <Insets bottom="5" left="5" right="5" top="5"/>
+            </padding>
+
+            <Label alignment="TOP_LEFT" contentDisplay="CENTER" prefHeight="25.0" prefWidth="388.0" text="Face id: ">
+              <HBox.margin>
+                <Insets top="10.0"/>
+              </HBox.margin>
+            </Label>
+
+
+
+          </HBox>
+
+          <Separator/>
+
+          <HBox alignment="TOP_LEFT" spacing="10">
+            <padding>
+              <Insets bottom="5" left="5" right="5" top="5"/>
+            </padding>
+
+            <Label alignment="TOP_LEFT" prefHeight="25.0" prefWidth="388.0" text="This person likes:  ">
+              <HBox.margin>
+                <Insets/>
+              </HBox.margin>
+            </Label>
+          </HBox>
+
+          <Separator/>
+
+          <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+          </padding>
+
+        </VBox>
+
+      </center>
+      <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+      </padding>
     </BorderPane>
-  </right>
+  </center>
 
 </BorderPane>
