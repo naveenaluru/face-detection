@@ -33,7 +33,7 @@ public class DynamoDBClient {
             InputStream in = new ByteArrayInputStream(((TagImageMapping)mapper.load(TagImageMapping.class,tag)).getImageBytes());
             BufferedImage bImage = ImageIO.read(in);
             WritableImage fxImage = SwingFXUtils.toFXImage(bImage, null);
-            return new Pair<String, WritableImage>(tag, fxImage);
+            return new Pair<String, WritableImage>(tagsString, fxImage);
         }
         
         return null;

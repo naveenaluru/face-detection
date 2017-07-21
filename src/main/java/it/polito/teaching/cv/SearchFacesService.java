@@ -23,25 +23,28 @@ import com.amazonaws.util.IOUtils;
 
 public class SearchFacesService {
 
-   public static final String COLLECTION_ID = "nnaircollection";
-   private static final String CREDENTIALS_KEY = "";
-   private static final String CREDENTIALS_SECRET = "";
-   private static final String PATH_TO_PROCESS = System.getProperty("user.dir") + "/faces";
-   private static final Float THRESHOLD = 70F;
-   private static final int MAX_FACES = 2;
+	public static final String COLLECTION_ID = "nnaircollection2";
+	private static final String PATH_TO_PROCESS = System.getProperty("user.dir")+"/faces";
+	private static final Float THRESHOLD = 70F;
+	private static final int MAX_FACES = 2;
+	
+    AmazonRekognition amazonRekognition = AmazonRekognitionClientBuilder.standard().withRegion(Regions.US_EAST_1)
+        .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(CREDENTIALS_KEY, CREDENTIALS_SECRET))).build();
 
    public List<FaceMatch> search() throws Exception {
+	   long start = System.currentTimeMillis();
 
-      AWSCredentials credentials = new BasicAWSCredentials(CREDENTIALS_KEY, CREDENTIALS_SECRET);
-      AmazonRekognition amazonRekognition = AmazonRekognitionClientBuilder.standard().withRegion(Regions.US_EAST_1)
-          .withCredentials(new AWSStaticCredentialsProvider(credentials)).build();
-
+      List<FaceMatch> matches = null;
+      
       File dir = new File(PATH_TO_PROCESS);
       if (dir.isDirectory()) {
-         return readPicturesAndFindMatch(amazonRekognition, dir);
+         matches = readPicturesAndFindMatch(amazonRekognition, dir);
       } else {
          throw new RuntimeException("Provided path is not a directory");
       }
+      long stop = System.currentTimeMillis();
+      System.out.println("Time in ms for search:"+ (stop-start));
+      return matches;
    }
 
    private List<FaceMatch> readPicturesAndFindMatch(AmazonRekognition amazonRekognition, File dir)
@@ -63,13 +66,24 @@ public class SearchFacesService {
              amazonRekognition);
 
          System.out.println("Faces matching largest face in image  " + photo.getName());
-         List<FaceMatch> faceImageMatches = searchFacesByImageResult.getFaceMatches();
-         for (FaceMatch face : faceImageMatches) {
-            System.out.println(face.getFace().toString());
-            System.out.println();
-         }
+         FaceMatch highMatchFace = null;
+         Float similarity = 0F;
+			if (searchFacesByImageResult != null) {
+				List<FaceMatch> faceImageMatches = searchFacesByImageResult.getFaceMatches();
+				for (FaceMatch face : faceImageMatches) {
+					if (face.getSimilarity() > similarity) {
+						similarity = face.getSimilarity();
+						highMatchFace = face;
+						System.out.println("FOund other high match: " + face.getFace().toString());
+					}
+					System.out.println(face.getFace().toString());
+					System.out.println();
+				}
 
-         faceMatches.addAll(searchFacesByImageResult.getFaceMatches());
+				if (highMatchFace != null) {
+					faceMatches.add(highMatchFace);
+				}
+			}
 
          photo.delete();
       }
@@ -83,7 +97,11 @@ public class SearchFacesService {
 				.withCollectionId(collectionId).withImage(image).withFaceMatchThreshold(THRESHOLD)
 				.withMaxFaces(MAX_FACES);
 		try {
-			return amazonRekognition.searchFacesByImage(searchFacesByImageRequest);
+			long start = System.currentTimeMillis();
+			SearchFacesByImageResult searchFacesByImage = amazonRekognition.searchFacesByImage(searchFacesByImageRequest);
+			long stop = System.currentTimeMillis();
+			System.out.println("Time in ms for amazon call:"+ (stop-start));
+			return searchFacesByImage;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

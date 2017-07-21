@@ -84,7 +84,7 @@ public class FaceDetectionController
 	private int absoluteFaceSize;
 
 
-	private int faceCaptureIntervalInSeconds =1;
+	private int faceCaptureIntervalInSeconds =2;
 
 	private long lastCapturedMillis = System.currentTimeMillis();
 
