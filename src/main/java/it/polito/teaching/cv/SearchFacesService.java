@@ -1,5 +1,6 @@
 package it.polito.teaching.cv;
 
+import it.polito.elite.teaching.cv.utils.PropertyLoader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -23,21 +24,20 @@ import com.amazonaws.util.IOUtils;
 
 public class SearchFacesService {
 
-   private static final String CREDENTIALS_KEY = "";
-   private static final String CREDENTIALS_SECRET = "";
-	public static final String COLLECTION_ID = "nnaircollection2";
-	private static final String PATH_TO_PROCESS = System.getProperty("user.dir")+"/faces";
-	private static final Float THRESHOLD = 70F;
-	private static final int MAX_FACES = 2;
-	
-    AmazonRekognition amazonRekognition = AmazonRekognitionClientBuilder.standard().withRegion(Regions.US_EAST_1)
-        .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(CREDENTIALS_KEY, CREDENTIALS_SECRET))).build();
+   public static final String COLLECTION_ID = "nnaircollection2";
+   private static final String PATH_TO_PROCESS = System.getProperty("user.dir") + "/faces";
+   private static final Float THRESHOLD = 70F;
+   private static final int MAX_FACES = 2;
+
+   AmazonRekognition amazonRekognition = AmazonRekognitionClientBuilder.standard().withRegion(Regions.US_EAST_1)
+       .withCredentials(new AWSStaticCredentialsProvider(
+           new BasicAWSCredentials(PropertyLoader.getAmazonKey(), PropertyLoader.getAmazonSecretKey()))).build();
 
    public List<FaceMatch> search() throws Exception {
-	   long start = System.currentTimeMillis();
+      long start = System.currentTimeMillis();
 
       List<FaceMatch> matches = null;
-      
+
       File dir = new File(PATH_TO_PROCESS);
       if (dir.isDirectory()) {
          matches = readPicturesAndFindMatch(amazonRekognition, dir);
@@ -45,7 +45,7 @@ public class SearchFacesService {
          throw new RuntimeException("Provided path is not a directory");
       }
       long stop = System.currentTimeMillis();
-      System.out.println("Time in ms for search:"+ (stop-start));
+      System.out.println("Time in ms for search:" + (stop - start));
       return matches;
    }
 
@@ -70,22 +70,22 @@ public class SearchFacesService {
          System.out.println("Faces matching largest face in image  " + photo.getName());
          FaceMatch highMatchFace = null;
          Float similarity = 0F;
-			if (searchFacesByImageResult != null) {
-				List<FaceMatch> faceImageMatches = searchFacesByImageResult.getFaceMatches();
-				for (FaceMatch face : faceImageMatches) {
-					if (face.getSimilarity() > similarity) {
-						similarity = face.getSimilarity();
-						highMatchFace = face;
-						System.out.println("FOund other high match: " + face.getFace().toString());
-					}
-					System.out.println(face.getFace().toString());
-					System.out.println();
-				}
+         if (searchFacesByImageResult != null) {
+            List<FaceMatch> faceImageMatches = searchFacesByImageResult.getFaceMatches();
+            for (FaceMatch face : faceImageMatches) {
+               if (face.getSimilarity() > similarity) {
+                  similarity = face.getSimilarity();
+                  highMatchFace = face;
+                  System.out.println("FOund other high match: " + face.getFace().toString());
+               }
+               System.out.println(face.getFace().toString());
+               System.out.println();
+            }
 
-				if (highMatchFace != null) {
-					faceMatches.add(highMatchFace);
-				}
-			}
+            if (highMatchFace != null) {
+               faceMatches.add(highMatchFace);
+            }
+         }
 
          photo.delete();
       }
@@ -93,21 +93,20 @@ public class SearchFacesService {
       return faceMatches;
    }
 
-	private SearchFacesByImageResult callSearchFacesByImage(String collectionId, Image image,
-			AmazonRekognition amazonRekognition) {
-		SearchFacesByImageRequest searchFacesByImageRequest = new SearchFacesByImageRequest()
-				.withCollectionId(collectionId).withImage(image).withFaceMatchThreshold(THRESHOLD)
-				.withMaxFaces(MAX_FACES);
-		try {
-			long start = System.currentTimeMillis();
-			SearchFacesByImageResult searchFacesByImage = amazonRekognition.searchFacesByImage(searchFacesByImageRequest);
-			long stop = System.currentTimeMillis();
-			System.out.println("Time in ms for amazon call:"+ (stop-start));
-			return searchFacesByImage;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
+   private SearchFacesByImageResult callSearchFacesByImage(String collectionId, Image image,
+       AmazonRekognition amazonRekognition) {
+      SearchFacesByImageRequest searchFacesByImageRequest = new SearchFacesByImageRequest()
+          .withCollectionId(collectionId).withImage(image).withFaceMatchThreshold(THRESHOLD).withMaxFaces(MAX_FACES);
+      try {
+         long start = System.currentTimeMillis();
+         SearchFacesByImageResult searchFacesByImage = amazonRekognition.searchFacesByImage(searchFacesByImageRequest);
+         long stop = System.currentTimeMillis();
+         System.out.println("Time in ms for amazon call:" + (stop - start));
+         return searchFacesByImage;
+      } catch (Exception e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
+      return null;
+   }
 }

@@ -1,5 +1,6 @@
 package it.polito.teaching.cv;
 
+import it.polito.elite.teaching.cv.utils.PropertyLoader;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -22,7 +23,7 @@ import javafx.util.Pair;
  */
 public class DynamoDBClient {
 
-    static AmazonDynamoDBClient ddbClient = new AmazonDynamoDBClient(new BasicAWSCredentials("AKIAJQ2BRVHBPDZKHF7Q","jduzxWN871QG0NJk26vbalO5mJkgoOLtK/vkrwbr"));
+    static AmazonDynamoDBClient ddbClient = new AmazonDynamoDBClient(new BasicAWSCredentials(PropertyLoader.getAmazonKey(), PropertyLoader.getAmazonSecretKey()));
 
     public static Pair<String, WritableImage> getPreference(String faceId) throws IOException {
         DynamoDBMapper mapper = new DynamoDBMapper(ddbClient);
