@@ -23,6 +23,8 @@ import com.amazonaws.util.IOUtils;
 
 public class SearchFacesService {
 
+   private static final String CREDENTIALS_KEY = "";
+   private static final String CREDENTIALS_SECRET = "";
 	public static final String COLLECTION_ID = "nnaircollection2";
 	private static final String PATH_TO_PROCESS = System.getProperty("user.dir")+"/faces";
 	private static final Float THRESHOLD = 70F;
